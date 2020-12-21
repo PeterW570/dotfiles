@@ -11,6 +11,7 @@ alias rm-pl='git checkout -- package-lock.json'
 
 # misc aliases
 alias cy:run:log='npm run cy:run -- --browser chrome --headless 2>&1 | tee cypress.log' # run cypress and add all logs to file
+alias list-code-exts='code --list-extensions | xargs -L 1 echo code --install-extension'
 
 # functions
 cyTest() {
