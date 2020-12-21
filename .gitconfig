@@ -1,0 +1,60 @@
+[alias]
+	# basic
+	s = status
+	co = checkout
+	nb = "!f() { git fetch && git co ${2-origin/master} && git co -b $1; }; f" # create a new branch off latest master, or a particular tag/commit
+	pullr = pull --rebase
+	pset = "!f() { git push --set-upstream origin ${1-$(git rev-parse --abbrev-ref HEAD)}; }; f" # push a branch to the remote
+	cherp = cherry-pick
+	cherpa = cherry-pick --abort
+	edit = rebase -i
+	praise = blame
+	mo = "!f() { git merge origin/$1; }; f"
+	aliases = !git config --get-regexp ^alias\\. | sed -e s/^alias.// -e s/\\ /\\ $(printf \"\\043\")--\\>\\ / | column -t -s $(printf \"\\043\") | sort -k 1
+	back = checkout @{-1} # checkout previous branch you were on
+
+	# stashing
+	spull = "!f() { git stash && git pullr; }; f" # stash then pull
+	spush = "!f() { git push && git stash pop; }; f" # push then pop
+	sshow = "!f() { git stash show stash@{${1-0}}; }; f" # show stash at index
+	sapply = "!f() { git stash apply stash@{${1-0}}; }; f" # apply stash at index
+	sdrop = "!f() { git stash drop stash@{${1-0}}; }; f" # drop stash at index
+
+	# file on another branch
+	blame-br = "!f() { git blame $1 -- $2 }; f" # e.g. git blame-br some-branch path/to/file
+	show-file = "!f() { git show $1:$2; }; f" # e.g. git show-file some-branch path/to/file
+	co-file = "!f() { git checkout -p $1 -- $2; }; f" # replace file on this branch with same file on another branch
+	file-change-commits = "!f() { git log --all --follow $1; }; f" # all commits that touch this file
+	file-changes = "!f() { git log -p -all --follow $1; }; f" # code changes in commits that touch this file
+	
+	# resetting
+	reset-to-origin = "!f() { git reset --hard origin/${1-$(git rev-parse --abbrev-ref HEAD)}; }; f" # get rid of unpushed changes
+	reset-file = checkout -- # get rid of local changes to file
+	uncommit = reset --soft HEAD^ # undo the act of committing (changes stay intact)
+	rm-local-br = branch -D # delete local branch
+	rm-remote-br = push -d origin # delete remote branch
+	rm-br = "!f() { git branch -D $1 && git push -d origin $1; }; f" # delete local & remote branch
+	
+	# logs
+	lo = "!f() { git log origin/$1; }; f" # log remote branch
+	lop = "!f() { git log -p origin/$1 }; f" # show code of changes on remote branch
+	stats = shortlog -sn --all --no-merges
+	recent = for-each-ref --count=10 --sort=committerdate refs/heads/ --format="%(refname:short)" # branches I've committed to recently
+	overview = log --all --oneline --no-merges
+	recap = "!f() { git log --all --oneline --no-merges --author=${1-$(git config user.email)}; }; f" # things I've comitted
+	today = "!f() { git log --all --since=00:00:00 --oneline --no-merges --author=${1-$(git config user.email)} }; f" # things I've comitted today
+	changelog = "!f() { git log --oneline --no-merges ${1-$(git describe --tags --abbrev=0)}..HEAD; }; f" # commits since last tag
+	upstream = "!f() { git log --oneline --no-merges HEAD..$1; }; f" # commits between this place and another branch
+
+	# tracking
+	brached-off = "!f() { git describe --tags --abbrev=0 --match 'v*' ${1-HEAD}; }; f" # if you tag your branches with e.g. v1.0.0 when releasing a new version
+	released-in = "!f() { git tag --contains ${1-HEAD} 'v*'  | head -n 1}; f" # see comment above
+	list-merged = branch --merged
+	list-unmerged = branch --no-merged
+	branch-code-diffs = "!f() { git diff ${2-HEAD}..$1; }; f" # one big code diff between two branches
+	branch-file-diffs = "!f() { git log --oneline --graph --decorate --abbrev-commit ${2-HEAD}..$1; }; f" # commits different between two branches
+	branches-containing = "!f() { git branch --contains $1; }; f"
+	find-deleted-file = rev-list -n 1 HEAD --
+
+	# misc
+	short-hash = rev-parse --short
